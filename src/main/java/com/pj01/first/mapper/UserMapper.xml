@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pj01.first.mapper.UserMapper">
+    <select id="findUserCountByMap" parameterType="map" resultType="int">
+        select count(*) from new_admin;
+    </select>
+    <select id="findUserInfoListByMap" parameterType="map" resultType="com.pj01.first.model.User">
+        select * from new_admin order by username desc limit #{start},#{pageSize};
+    </select>
+    <insert id="insert" parameterType="User">
+        insert into new_admin (username,password) values (#{username},#{password});
+    </insert>
+
+
+    <select id="findUserOptionCount" parameterType="map" resultType="int">
+        select count(*) from system_option where id in (select id from user_optionId where username=#{username});
+    </select>
+    <select id="findThisUserOption" parameterType="map" resultType="com.pj01.first.model.Program">
+        select * from system_option where id in (select id from user_optionId where username=#{username});
+    </select>
+    <insert id="insertNewOption" parameterType="string">
+        insert into user_optionid (username,id) values (#{thisname},#{id});
+    </insert>
+    <delete id="deleteOption" parameterType="string">
+        delete from user_optionid where username = #{thisname} and id = #{id};
+    </delete>
+    <delete id="deleteThisUser" parameterType="string">
+        delete from new_admin where username = #{username};
+    </delete>
+    <delete id="deleteUserOption" parameterType="string">
+        delete from user_optionid where username = #{username};
+    </delete>
+    <select id="findOption" parameterType="string" resultType="arraylist">
+        select id from user_optionid where username = #{username};
+    </select>
+</mapper>

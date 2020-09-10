@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="/zTree_v3/css/zTreeStyle/zTreeStyle.css" type="text/css" rel="stylesheet">
+    <script src="/zTree_v3/demo/js/jquery-1.4.4.min.js" type="application/javascript"></script>
+    <script src="/zTree_v3/demo/js/jquery.ztree.all.min.js"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+</head>
+<body>
+<form class="layui-form" action="" id="form1">
+    <div class="layui-form-item">
+        <ul id="tree" class="ztree" style="width:230px; overflow:auto;"></ul>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" onclick="doSave();" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    var setting = {
+        data: {
+            simpleData: {
+                enable: true,  //true 、 false 分别表示 使用 、 不使用 简单数据模式
+                idKey: "id",   //节点数据中保存唯一标识的属性名称
+                pIdKey: "pid",    //节点数据中保存其父节点唯一标识的属性名称
+                rootPId: -1  //用于修正根节点父节点数据，即 pIdKey 指定的属性值
+            },
+            key: {
+                name: "option_name"  //zTree 节点数据保存节点名称的属性名称  默认值："name"
+            }
+        },
+        check: {
+            enable: true,  //true 、 false 分别表示 显示 、不显示 复选框或单选框
+            nocheckInherit: true   //当父节点设置 nocheck = true 时，设置子节点是否自动继承 nocheck = true
+        }
+    };
+
+    $(document).ready(function () {
+        $.ajax({
+            type: "get",
+            url: "/progadmin/AlllistJson",
+            async: true,
+            success: function (res) {
+                zTreeObj = $.fn.zTree.init($("#tree"), setting, res.data); //初始化树
+                zTreeObj.expandAll(true);   //true 节点全部展开、false节点收缩
+
+                $.ajax({
+                    type: "get",
+                    url: "/user/thisUserOptionJson",
+                    async: true,
+                    success: function (resData) {
+                        for (let i = 0; i < resData.data.length; i++) {
+                            var node = zTreeObj.getNodeByParam("id", resData.data[i].id);
+                            zTreeObj.checkNode(node, true, false);
+                        }
+                    }
+                })
+            }
+        });
+    });
+
+    function doSave() {
+        var requestData = zTreeObj.getCheckedNodes(true);
+        // console.log(requestData);
+        var newList = new Array();
+        for (var i = 0; i < requestData.length; i++) {
+            newList[i] = requestData[i].id;
+        }
+        // console.log(newList);
+        var ID = JSON.stringify(newList);
+        // console.log(ID);
+        $.ajax({
+            url: "/user/update",
+            type: 'post',
+            contentType: "application/json",
+            data: ID,
+            function(responseData) {
+                if (responseData.success == 1) {
+                    layer.alert("添加成功", {
+                        yes: function () {
+                            parent.layer.closeAll();
+                        }
+                    })
+                }
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

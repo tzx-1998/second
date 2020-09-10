@@ -10,4 +10,5 @@ public class HelloController {
         System.out.println("建国70周年");
         return "index";
     }
+
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pj01.first.mapper.OptionMapper">
+    <select id="findOptionCountByMap" parameterType="map" resultType="int">
+        select count(*) from system_option where id in (select id from user_optionId where username=#{username});
+    </select>
+    <select id="findOptionByMap" parameterType="map" resultType="com.pj01.first.model.Program">
+        select * from system_option where id in (select id from user_optionId where username=#{username});
+    </select>
+    <select id="findAlloptionCount" parameterType="map" resultType="int">
+        select count(*) from system_option;
+    </select>
+    <select id="findAlloption" parameterType="map" resultType="com.pj01.first.model.Program">
+        select * from system_option;
+    </select>
+    <insert id="insert" parameterType="Program">
+        insert into system_option (option_name,pid,path,id) values (#{option_name},#{pid},#{path},#{id});
+    </insert>
+    <delete id="deleteByOptionId" parameterType="string">
+        delete from system_option where id = #{id};
+    </delete>
+</mapper>

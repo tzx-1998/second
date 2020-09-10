@@ -11,8 +11,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
 
-    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"  media="all">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
     <script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
@@ -43,32 +44,31 @@
                     <dd><a href="">安全设置</a></dd>
                 </dl>
             </li>
-            <li class="layui-nav-item"><a href="">退了</a></li>
+            <li class="layui-nav-item"><a href="/login">退出</a></li>
         </ul>
     </div>
 
     <div class="layui-side layui-bg-black">
-        <div class="layui-side-scroll">
-            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-            <ul class="layui-nav layui-nav-tree"  lay-filter="test">
-                <li class="layui-nav-item layui-nav-itemed">
-                    <a class="" href="javascript:;">常用功能</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="/courseorder/list" target="content_iFrm">课程订单</a></dd>
-                        <dd><a href="/stuinfo/list" target="content_iFrm">学员信息</a></dd>
-<!--                        <dd><a href="javascript:;">列表三</a></dd>-->
-<!--                        <dd><a href="">超链接</a></dd>-->
-                    </dl>
-                </li>
-                <li class="layui-nav-item">
-                    <a href="javascript:;">数据分析</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="javascript:;">收入报表</a></dd>
-                        <dd><a href="javascript:;">学院分布图</a></dd>
-                    </dl>
-                </li>
-                <li class="layui-nav-item"><a href="">发布计划</a></li>
-                <li class="layui-nav-item"><a href="">点点滴滴</a></li>
+        <div class="layui-side-scroll" id="myDiv">
+
+            <ul class="layui-nav layui-nav-tree" lay-filter="test" id="fajax">
+<!--                <li class="layui-nav-item ">-->
+<!--                    <a class="" href="javascript:;">常用功能</a>-->
+<!--                    <dl class="layui-nav-child">-->
+<!--                        <dd><a href="/courseorder/list" target="content_iFrm">课程订单</a></dd>-->
+<!--                        <dd><a href="/stuinfo/list" target="content_iFrm">学员信息</a></dd>-->
+<!--                    </dl>-->
+<!--                </li>-->
+<!--                <li class="layui-nav-item ">-->
+<!--                    <a href="javascript:;">数据分析</a>-->
+<!--                    <dl class="layui-nav-child">-->
+<!--                        <dd><a href="/dataanalysis/income" target="content_iFrm">收入报表</a></dd>-->
+<!--                        <dd><a href="javascript:;">学院分布图</a></dd>-->
+<!--                    </dl>-->
+<!--                </li>-->
+<!--                <li class="layui-nav-item"><a href="/progadmin/prog" target="content_iFrm">系统管理</a></li>-->
+<!--                <li class="layui-nav-item"><a href="">发布计划</a></li>-->
+<!--                <li class="layui-nav-item"><a href="">点点滴滴</a></li>-->
             </ul>
         </div>
     </div>
@@ -79,27 +79,78 @@
                 style="width: 100%;height: 100%;" src="/courseorder/list"></iframe>
     </div>
 
-    <div class="layui-footer">
-        <!-- 底部固定区域 -->
-        © layui.com - 底部固定区域
-    </div>
 </div>
 
 <script>
     //JavaScript代码区域
-    layui.use('element', function(){
+    layui.use(['element', 'layer'], function () {
         var element = layui.element;
 
     });
 </script>
 <script>
     var _hmt = _hmt || [];
-    (function() {
+    (function () {
         var hm = document.createElement("script");
         hm.src = "https://hm.baidu.com/hm.js?d214947968792b839fd669a4decaaffc";
         var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(hm, s);
     })();
+</script>
+<script src="layui/lay/modules/jquery.js"></script>
+<script>
+    let $ = layui.jquery;
+    $(document).ready(function () {
+        $.ajax({
+            type: 'get',
+            url: '/progadmin/listJson',
+            dataType: 'json',
+            async: true,
+            success: function (resData) {
+                var tempArray = new Array();
+                for(let i = 0;i<resData.data.length;i++){
+                    tempArray[i] =0 ;
+                }
+                for(let i = 0;i<resData.data.length;i++){
+                    if(resData.data[i].pid!=0){
+                        var temp = resData.data[i].pid-1;
+                        tempArray[temp] = 1;
+                    }
+                }
+                for (let i = 0; i < resData.data.length; i++) {
+                    if (resData.data[i].pid == 0) {
+                        let liDom = '<li class="layui-nav-item layui-nav-itemed"><a  href="javascript:;">' + resData.data[i].option_name + '</a></li>';
+                        let liDom2 = '<li class="layui-nav-item"><a  href=' + resData.data[i].path + ' target="content_iFrm">' + resData.data[i].option_name + '</a></li>';
+                        if (i != resData.data.length - 1) {
+                            if (tempArray[i]!=0) {
+                                $("#fajax").append(liDom);
+                            } else {
+                                $("#fajax").append(liDom2);
+                            }
+                        } else {
+                            $("#fajax").append(liDom2);
+                        }
+
+                }}
+
+                let index = 0;
+                for (let i = 0; i < resData.data.length; i++) {
+                    if (resData.data[i].pid == 0) {
+                         if (i != resData.data.length - 1) {
+                             if (tempArray[i]!=0) {
+                                $("#fajax").find("li").eq(index).append('<dl class=layui-nav-child></dl>');
+                             }
+                         }
+                        index++;
+                    } else {
+                        $("#fajax").find("li").eq(index - 1).find("dl").eq(0).append('<dd><a href=' + resData.data[i].path + ' target="content_iFrm">' + resData.data[i].option_name + '</a></dd>');
+                    }
+
+                }
+
+            }
+        })
+    })
 </script>
 </body>
 </html>

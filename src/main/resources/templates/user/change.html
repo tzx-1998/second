@@ -11,35 +11,6 @@
     <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
 </head>
 <body>
-<br>
-<form class="layui-form" action="" id="searchform">
-    <div class="layui-form-item">
-
-        <div class="layui-inline">
-            <label class="layui-form-label">Wechat号</label>
-            <div class="layui-input-inline">
-                <input type="text" name="wechat_no" id="wechat_no" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-inline">
-            <label class="layui-form-label">Wechat备注</label>
-            <div class="layui-input-inline">
-                <input type="text" name="wechat_mark" id="wechat_mark" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-inline">
-            <label class="layui-form-label">QQ</label>
-            <div class="layui-input-inline">
-                <input type="text" name="qq_no" id="qq_no" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-inline">
-            <button type="button" onclick="doSearch();" class="layui-btn">搜索</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-
-    </div>
-</form>
 <table class="layui-hide" id="test" lay-filter="test"></table>
 
 <script type="text/html" id="toolbarDemo">
@@ -51,7 +22,6 @@
     </div>
 </script>
 <script type="text/html" id="barDemo">
-    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 
@@ -65,40 +35,23 @@
         //详见：https://www.layui.com/doc/modules/table.html#totalRow
         table.render({
             elem: '#test'
-            , url: '/courseorder/listJson'
+            , url: '/user/thisUserOptionJson'
             , toolbar: '#toolbarDemo'
             , title: '用户数据表'
-            ,request:{
+            , totalRow: true,
+            request:{
                 pageName:'page',
                 limitName:'limit'
             }
-            , totalRow: true
             , cols: [
                 [
                     {type: 'checkbox', fixed: 'left'}
-                    , {
-                    field: 'id',
-                    title: 'ID',
-                    width: 80,
-                    fixed: 'left',
-                    unresize: true,
-                    sort: true,
-                    totalRowText: '合计'
-                }
-                    , {field: 'name', title: '名字', width: 120}
-                    , {field: 'wechat_mark', title: '微信备注', width: 120}
-                    , {field: 'wechat_no', title: '微信ID', width: 120}
-                    , {field: 'qq_no', title: 'QQ号', width: 120}
-                    , {field: 'course_name', title: '购买课程', width: 120}
-                    , {field: 'course_price', title: '价格', width: 120}
-                    , {field: 'order_date', title: '订单日期', width: 120}
-                    , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150}
+                    , {field: 'id', title: 'ID', width: 100}
+                    , {field: 'option_name', title: '权限名称', width: 120}
+                    , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 140}
                 ]
             ]
-            , page: true,
-            limit: 7
-            , limits: [7, 8, 9, 10]
-            , id: 'orderTable'
+
         });
 
         //工具栏事件
@@ -120,10 +73,9 @@
                     parent.layer.open({
                         type: 2,
                         offset: 'auto',
-                        title: '添加课程订单',
-                        content: '/courseorder/add',
-                        area: ['1000px', '500px'],
-                        btn: '全部关闭',
+                        title: '添加权限',
+                        content: '/user/addOption',
+                        area: ['700px', '300px'],
                         btnAlign: 'c',
                         yes: function () {
                             parent.layer.closeAll();
@@ -134,24 +86,9 @@
             }
             ;
         });
-        table.on('rowDouble(test)', function (obj) {
-            var orderId = obj.data.order_id;
-            parent.layer.open({
-                type: 2,
-                offset: 'auto',
-                title: '课程订单详情',
-                content: '/courseorder/detail?order_id=' + orderId,
-                area: ['1000px', '500px'],
-                btn: '全部关闭',
-                btnAlign: 'c',
-                yes: function () {
-                    parent.layer.closeAll();
 
-                }
-            })
-        });
         table.on('tool(test)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
-            var orderId = obj.data.order_id; //获得当前行数据
+            var id = obj.data.id;//获得当前行数据
             var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
 
             if (layEvent === 'del') { //删除
@@ -159,8 +96,10 @@
                     obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
                     layer.close(index);
                     //向服务端发送删除指令
-                    $.get("/courseorder/delete", {orderId: orderId}, function (resdData) {
+                    $.get("/user/deleteOption", {id:id}, function (resdData) {
                         //$.ajax( type:"get",url :"/courseorder/delete",dataType:"json",success:function(resdData){
+                        // console.log(orderId);
+                        // console.log(resdData);
                         if (resdData.success == 1) {
                             layer.msg("删除成功");
                         } else {
@@ -168,12 +107,12 @@
                         }
                     })
                 });
-            } else if (layEvent === 'edit') {
+            }else if (layEvent === 'edit') {
                 parent.layer.open({
                     type: 2,
                     offset: 'auto',
-                    title: '修改课程订单',
-                    content: '/courseorder/edit?orderId=' + orderId,
+                    title: '修改权限',
+                    content: '/user/remake?username=' + username,
                     area: ['1000px', '500px'],
                     btn: '全部关闭',
                     btnAlign: 'c',
@@ -188,22 +127,7 @@
 
     });
 
-    function doSearch() {
-        var wechat_no = $('#wechat_no').val();
-        var wechat_mark = $('#wechat_mark').val();
-        var qq_no = $('#qq_no').val();
-        table.reload('orderTable', {
 
-            where: {
-                wechat_mark: wechat_mark,
-                wechat_no: wechat_no,
-                qq_no: qq_no
-            },page: {
-                curr: 1 //重新从第 1 页开始
-            }
-
-        });
-    }
 </script>
 
 </body>

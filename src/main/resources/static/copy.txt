@@ -1,0 +1,19 @@
+<ul class="layui-nav layui-nav-tree"  lay-filter="test" >
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">常用功能</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/courseorder/list" target="content_iFrm">课程订单</a></dd>
+                        <dd><a href="/stuinfo/list" target="content_iFrm">学员信息</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">数据分析</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/dataanalysis/income" target="content_iFrm">收入报表</a></dd>
+                        <dd><a href="javascript:;">学院分布图</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="/progadmin/prog" target="content_iFrm">系统管理</a></li>
+                <li class="layui-nav-item"><a href="">发布计划</a></li>
+                <li class="layui-nav-item"><a href="">点点滴滴</a></li>
+            </ul>
