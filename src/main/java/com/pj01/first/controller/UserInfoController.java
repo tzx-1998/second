@@ -57,7 +57,6 @@ public class UserInfoController {
     @ResponseBody
     public CURDResult update(@RequestBody  List<String> ID) {
         CURDResult result = new CURDResult();
-        System.out.println(ID);
         userInfoService.update(ID,thisname);
         return result;
     }

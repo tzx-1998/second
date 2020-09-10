@@ -68,6 +68,7 @@ public class UserInfoImpl  implements IUserInfoService {
             temp1[i] = 0;
             temp2[i] = 0;
         }
+        System.out.println(username);
         List find = userMapper.findOption(username);
         for(int i=0;i<find.size();i++){
             Object t = find.get(i);
